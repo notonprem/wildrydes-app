@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: A sample template
+Metadata:
+  Version: 1.0.0
+
+Parameters:
+  InstanceName:
+    Description: Name of an EC2 instance(s)
+    Type: String
+
+  BucketName:
+    Description: Name of a s3 bucket
+    Type: String
+
+Resources:
+  MyEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0b0dcb5067f052a63
+      InstanceType: t2.micro
+      BlockDeviceMappings:
+        - DeviceName: /dev/sdm
+          Ebs:
+            VolumeType: io1
+            Iops: 200
+            DeleteOnTermination: false
+            VolumeSize: 20
+      Tags:
+        - Key: "Name"
+          Value: !Ref InstanceName
+
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+  InstanceID:
+    Description: The Instance ID
+    Value: !Ref MyEC2Instance
+
+  BucketName:
+    Description: The name of the s3 bucket
+    Value: !Ref BucketName
