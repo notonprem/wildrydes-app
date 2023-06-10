@@ -33,3 +33,6 @@ jobs:
           name: task-one-stack-v1
           template: cloudformation_template.yml
           no-fail-on-empty-changeset: "1"
+          parameter-overrides: >-
+            InstanceName=ec2-cicd-instance,
+            BucketName=s3-cicd-26112022-01
