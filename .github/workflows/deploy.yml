@@ -30,9 +30,9 @@ jobs:
       - name: Deploy task-one stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: task-one-stack-v1
-          template: cloudformation_template.yml
+          name: WildRydes_Stack
+          template: wildrydes_template.yml
           no-fail-on-empty-changeset: "1"
           parameter-overrides: >-
-            InstanceName=ec2-cicd-instance,
-            BucketName=s3-cicd-26112022-01
+            AccessToken=${{ secrets.ACCESS_TOKEN }},
+            Repository=https://github.com/notonprem/wildrydes-site
