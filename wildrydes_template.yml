@@ -13,7 +13,7 @@ Parameters:
     Type: String
 
 Resources:
-  WildRydesAmplify:
+  WildRydesAmplifyApp:
     Type: AWS::Amplify::App
     Properties: 
       AccessToken: !Ref AccessToken
@@ -21,3 +21,11 @@ Resources:
       Name: wildrydes-site
       Platform: WEB
       Repository: !Ref Repository
+
+  WildRydesAmplifyBranch:
+    Type: AWS::Amplify::Branch
+    Properties: 
+      AppId: !GetAtt WildRydesAmplifyApp.AppId
+      BranchName: main
+      EnableAutoBuild: true
+      Framework: Web
