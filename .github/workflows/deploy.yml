@@ -2,7 +2,7 @@ name: 'Deploy to AWS CloudFormation'
 
 on: 
   push:
-    branches: [ main, staging, develop ]
+    branches: [ main, staging, develop, feature-enable-pipeline ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
       - name: Deploy task-one stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: WildRydes_Stack
+          name: WildRydes-Stack
           template: wildrydes_template.yml
           no-fail-on-empty-changeset: "1"
           parameter-overrides: >-
