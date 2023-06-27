@@ -43,18 +43,16 @@ jobs:
           aws cloudformation describe-stacks --stack-name WildRydes-Stack --query "Stacks[0].Outputs" --output json > stack-outputs.json
           export JSON_FILE=stack-outputs.json
 
-          userPoolClientId=$(jq -r '.[0].OutputValue' "$JSON_FILE")
-          userPoolId=$(jq -r '.[1].OutputValue' "$JSON_FILE")
+          export userPoolClientId=$(jq -r '.[0].OutputValue' "$JSON_FILE")
+          export userPoolId=$(jq -r '.[1].OutputValue' "$JSON_FILE")
 
-          export userPoolClientId
-          export userPoolId
+          echo "variables echoing...."
+          echo $userPoolClientId
+          echo $userPoolId
 
       # Push changes to repository
       - name: Push changes to repository
         run: |
-          apt-get update && apt-get install -y git
-
-
           git config --global user.email "folusomaine@gmail.com"
           git config --global user.name "Foluso Ogunsakin"
 
