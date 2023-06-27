@@ -29,3 +29,27 @@ Resources:
       BranchName: main
       EnableAutoBuild: true
       Framework: Web
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: WildRydes
+      AliasAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: WildRydesWeb
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+
+Outputs:
+  userPoolId:
+    Description: The User Pool ID
+    Value: !Ref UserPool
+  userPoolClientId:
+    Description: The User Pool Client ID
+    Value: !Ref UserPoolClient

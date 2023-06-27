@@ -1,15 +1,15 @@
 name: 'Deploy to AWS CloudFormation'
 
-on: 
+on:
   push:
-    branches: [ main, staging, develop, feature-enable-pipeline ]
+    branches: [ main, staging, develop ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   # This workflow contains a single job called "deploy"
-  deploy:
+  deploy-website-and-cognito:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -26,8 +26,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.ACCESS_KEY_SECRET }}
           aws-region: us-east-1
 
-      # Deploy to AWS CloudFormation our CFN stack
-      - name: Deploy task-one stack to AWS CloudFormation
+      # Deploy to AWS CloudFormation
+      - name: Deploy stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: WildRydes-Stack
@@ -36,3 +36,33 @@ jobs:
           parameter-overrides: >-
             AccessToken=${{ secrets.ACCESS_TOKEN }},
             Repository=https://github.com/notonprem/wildrydes-site
+
+      # Grab stack outputs
+      - name: Grab stack outputs
+        run: |
+          set -e
+          aws cloudformation describe-stacks --stack-name WildRydes-Stack --query "Stacks[0].Outputs" --output json > stack-outputs.json
+          userPoolId=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey == "userPoolId") | .OutputValue' stack-outputs.json)
+          userPoolClientId=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey == "userPoolClientId") | .OutputValue' stack-outputs.json)
+
+      # Push changes to repository
+      - name: Push changes to repository
+        run: |
+          set -e
+          apt-get update && apt-get install -y git
+
+
+          git config --global user.email "folusomaine@gmail.com"
+          git config --global user.name "Foluso Ogunsakin"
+
+          echo "machine github.com login folusomaine password ${{ secrets.ACCESS_TOKEN }}" > ~/.netrc
+
+          git clone https://github.com/notonprem/wildrydes-site.git
+          cd wildrydes-site
+
+          sed -i "s/userPoolId:.*/userPoolId: '$userPoolId',/" js/config.js
+          sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
+
+          git add .
+          git commit -m "inserted new userPoolId and userPoolClientId to config.js"
+          git push -u origin main
