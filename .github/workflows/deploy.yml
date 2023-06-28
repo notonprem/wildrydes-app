@@ -47,7 +47,6 @@ jobs:
           userPoolId=$(jq -r '.[] | select(.OutputKey == "userPoolId") | .OutputValue' "$JSON_FILE")
           userPoolClientId=$(jq -r '.[] | select(.OutputKey == "userPoolClientId") | .OutputValue' "$JSON_FILE")
 
-          echo "echoing variables...."
           echo "userPoolClientId=$userPoolClientId" >> $GITHUB_ENV
           echo "userPoolId=$userPoolId" >> $GITHUB_ENV
 
@@ -70,9 +69,6 @@ jobs:
           sed -i "s/userPoolId:.*/userPoolId: '$userPoolId',/" js/config.js
           sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
 
-          cat js/config.js
-
-          git add .
-          current_date_time=$(date)
-          git commit -m 'updated: $current_date_time'
-          git push || true
+          git add -A
+          git diff --quiet HEAD || git commit -m 'updated: $current_date_time'
+          git push
