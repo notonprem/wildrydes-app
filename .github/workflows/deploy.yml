@@ -2,7 +2,7 @@ name: 'Deploy to AWS CloudFormation'
 
 on:
   push:
-    branches: [ main, staging, develop ]
+    branches: [ main, staging, develop, feature-enable-pipeline ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -47,8 +47,8 @@ jobs:
           export userPoolId=$(jq -r '.[1].OutputValue' "$JSON_FILE")
 
           echo "echoing variables...."
-          echo $userPoolClientId
-          echo $userPoolId
+          echo $userPoolClientId  >> "$GITHUB_ENV"
+          echo $userPoolId  >> "$GITHUB_ENV"
 
       # Push changes to repository
       - name: Push changes to repository
@@ -62,15 +62,10 @@ jobs:
           cd wildrydes-site
 
           echo "echoing variables...."
-          echo $userPoolClientId
-          echo $userPoolId
+          echo "${{ env.userPoolId }}"
+          echo "${{ env.userPoolClientId }}"
 
-          sed -i "s/userPoolId:.*/userPoolId: '$userPoolId',/" js/config.js
-          sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
+          sed -i "s/userPoolId:.*/userPoolId: "${{ env.userPoolId }}",/" js/config.js
+          sed -i "s/userPoolClientId:.*/userPoolClientId: "${{ env.userPoolClientId }}",/" js/config.js
 
-          git add .
-          git commit -m "echo variables"
-          (
-            set +e
-            git push -u origin main
-          )
+          cat js/config.js
