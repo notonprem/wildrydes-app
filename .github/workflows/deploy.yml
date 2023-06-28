@@ -67,14 +67,12 @@ jobs:
           echo $userPoolId
           echo $userPoolClientId
 
-          sed -i "s/userPoolId:.*/userPoolId: $userPoolId,/" js/config.js
-          sed -i "s/userPoolClientId:.*/userPoolClientId: $userPoolClientId,/" js/config.js
+          sed -i "s/userPoolId:.*/userPoolId: '$userPoolId',/" js/config.js
+          sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
 
           cat js/config.js
 
           git add .
-          commitMessage=$(git status --short)
-          echo "commitMessage=$commitMessage" >> $GITHUB_ENV
 
-          git commit -m $commitMessage
-          git push
+          git commit -m 'tests push'
+          git push || true
