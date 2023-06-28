@@ -44,8 +44,8 @@ jobs:
           aws cloudformation describe-stacks --stack-name WildRydes-Stack --query "Stacks[0].Outputs" --output json > stack-outputs.json
           export JSON_FILE=stack-outputs.json
 
-          userPoolClientId=$(jq -r '.[0].OutputValue' "$JSON_FILE")
-          userPoolId=$(jq -r '.[1].OutputValue' "$JSON_FILE")
+          userPoolId=$(jq -r '.[] | select(.OutputKey == "userPoolId") | .OutputValue' "$JSON_FILE")
+          userPoolClientId=$(jq -r '.[] | select(.OutputKey == "userPoolClientId") | .OutputValue' "$JSON_FILE")
 
           echo "echoing variables...."
           echo "userPoolClientId=$userPoolClientId" >> $GITHUB_ENV
@@ -73,6 +73,6 @@ jobs:
           cat js/config.js
 
           git add .
-
-          git commit -m 'tests push'
+          current_date_time=$(date)
+          git commit -m 'updated: $current_date_time'
           git push || true
