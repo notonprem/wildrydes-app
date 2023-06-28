@@ -70,5 +70,5 @@ jobs:
           sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
 
           git add -A
-          git diff --quiet HEAD || git commit -m 'updated: $current_date_time'
+          git diff --quiet HEAD || git commit -m 'config updated: $current_date_time'
           git push

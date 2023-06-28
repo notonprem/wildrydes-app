@@ -15,7 +15,7 @@ Parameters:
 Resources:
   WildRydesAmplifyApp:
     Type: AWS::Amplify::App
-    Properties: 
+    Properties:
       AccessToken: !Ref AccessToken
       Description: WildRydes Amplify App
       Name: wildrydes-site
@@ -24,13 +24,14 @@ Resources:
 
   WildRydesAmplifyBranch:
     Type: AWS::Amplify::Branch
-    Properties: 
+    Properties:
       AppId: !GetAtt WildRydesAmplifyApp.AppId
       BranchName: main
       EnableAutoBuild: true
       Framework: Web
 
   UserPool:
+    DependsOn: WildRydesAmplifyBranch
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: WildRydes
