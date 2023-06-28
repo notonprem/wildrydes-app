@@ -70,4 +70,7 @@ jobs:
 
           git add .
           git commit -m "echo variables"
-          git push -u origin main || true
+          (
+            set +e
+            git push -u origin main
+          )
