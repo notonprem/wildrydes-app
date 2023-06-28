@@ -39,19 +39,21 @@ jobs:
 
       # Grab stack outputs
       - name: Grab stack outputs
+        shell: bash
         run: |
           aws cloudformation describe-stacks --stack-name WildRydes-Stack --query "Stacks[0].Outputs" --output json > stack-outputs.json
           export JSON_FILE=stack-outputs.json
 
-          export userPoolClientId=$(jq -r '.[0].OutputValue' "$JSON_FILE")
-          export userPoolId=$(jq -r '.[1].OutputValue' "$JSON_FILE")
+          userPoolClientId=$(jq -r '.[0].OutputValue' "$JSON_FILE")
+          userPoolId=$(jq -r '.[1].OutputValue' "$JSON_FILE")
 
           echo "echoing variables...."
-          echo $userPoolClientId  >> "$GITHUB_ENV"
-          echo $userPoolId  >> "$GITHUB_ENV"
+          echo "userPoolClientId=$userPoolClientId" >> $GITHUB_ENV
+          echo "userPoolId=$userPoolId" >> $GITHUB_ENV
 
       # Push changes to repository
       - name: Push changes to repository
+        shell: bash
         run: |
           git config --global user.email "folusomaine@gmail.com"
           git config --global user.name "Foluso Ogunsakin"
@@ -62,10 +64,17 @@ jobs:
           cd wildrydes-site
 
           echo "echoing variables...."
-          echo "${{ env.userPoolId }}"
-          echo "${{ env.userPoolClientId }}"
+          echo $userPoolId
+          echo $userPoolClientId
 
-          sed -i "s/userPoolId:.*/userPoolId: "${{ env.userPoolId }}",/" js/config.js
-          sed -i "s/userPoolClientId:.*/userPoolClientId: "${{ env.userPoolClientId }}",/" js/config.js
+          sed -i "s/userPoolId:.*/userPoolId: $userPoolId,/" js/config.js
+          sed -i "s/userPoolClientId:.*/userPoolClientId: $userPoolClientId,/" js/config.js
 
           cat js/config.js
+
+          git add .
+          commitMessage=$(git status --short)
+          echo "commitMessage=$commitMessage" >> $GITHUB_ENV
+
+          git commit -m $commitMessage
+          git push
