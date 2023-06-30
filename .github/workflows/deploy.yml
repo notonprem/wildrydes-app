@@ -2,14 +2,14 @@ name: 'Deploy to AWS CloudFormation'
 
 on:
   push:
-    branches: [ main, staging, develop, feature-enable-pipeline ]
+    branches: [ main, staging, develop ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   # This workflow contains a single job called "deploy"
-  deploy-website-and-cognito:
+  deploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -70,5 +70,6 @@ jobs:
           sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
 
           git add -A
+          current_date_time=$(date)
           git diff --quiet HEAD || git commit -m 'config updated: $current_date_time'
-          git push
+          git push -u origin main
