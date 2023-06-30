@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: The AWS resources for the backend of the WildRydes-Site.
+Metadata:
+  Version: 1.0.0
+
+Parameters:
+  AccessToken:
+    Description: GitHub Personal Access Token for Amplify
+    Type: String
+
+  Repository:
+    Description: WildRydes site GitHub Repository
+    Type: String
+
+Resources:
+  WildRydesAmplifyApp:
+    Type: AWS::Amplify::App
+    Properties:
+      AccessToken: !Ref AccessToken
+      Description: WildRydes Amplify App
+      Name: wildrydes-site
+      Platform: WEB
+      Repository: !Ref Repository
+
+  WildRydesAmplifyBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      AppId: !GetAtt WildRydesAmplifyApp.AppId
+      BranchName: main
+      EnableAutoBuild: true
+      Framework: Web
+
+  UserPool:
+    DependsOn: WildRydesAmplifyBranch
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: WildRydes
+      AliasAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: WildRydesWeb
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+
+Outputs:
+  userPoolId:
+    Description: The User Pool ID
+    Value: !Ref UserPool
+  userPoolClientId:
+    Description: The User Pool Client ID
+    Value: !Ref UserPoolClient
