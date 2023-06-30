@@ -72,4 +72,4 @@ jobs:
           git add -A
           current_date_time=$(date)
           git diff --quiet HEAD || git commit -m 'config updated: $current_date_time'
-          git push -u origin main
+          git push
