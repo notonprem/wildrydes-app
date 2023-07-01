@@ -9,7 +9,7 @@ on:
 
 jobs:
   # This workflow contains a single job called "deploy"
-  deploy-website-and-cognito:
+  deploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -39,19 +39,20 @@ jobs:
 
       # Grab stack outputs
       - name: Grab stack outputs
+        shell: bash
         run: |
           aws cloudformation describe-stacks --stack-name WildRydes-Stack --query "Stacks[0].Outputs" --output json > stack-outputs.json
           export JSON_FILE=stack-outputs.json
 
-          export userPoolClientId=$(jq -r '.[0].OutputValue' "$JSON_FILE")
-          export userPoolId=$(jq -r '.[1].OutputValue' "$JSON_FILE")
+          userPoolId=$(jq -r '.[] | select(.OutputKey == "userPoolId") | .OutputValue' "$JSON_FILE")
+          userPoolClientId=$(jq -r '.[] | select(.OutputKey == "userPoolClientId") | .OutputValue' "$JSON_FILE")
 
-          echo "echoing variables...."
-          echo $userPoolClientId
-          echo $userPoolId
+          echo "userPoolClientId=$userPoolClientId" >> $GITHUB_ENV
+          echo "userPoolId=$userPoolId" >> $GITHUB_ENV
 
       # Push changes to repository
       - name: Push changes to repository
+        shell: bash
         run: |
           git config --global user.email "folusomaine@gmail.com"
           git config --global user.name "Foluso Ogunsakin"
@@ -62,15 +63,13 @@ jobs:
           cd wildrydes-site
 
           echo "echoing variables...."
-          echo $userPoolClientId
           echo $userPoolId
+          echo $userPoolClientId
 
           sed -i "s/userPoolId:.*/userPoolId: '$userPoolId',/" js/config.js
           sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
 
-          git add .
-          git commit -m "echo variables"
-          (
-            set +e
-            git push -u origin main
-          )
+          git add -A
+          current_date_time=$(date)
+          git diff --quiet HEAD || git commit -m "config updated: $current_date_time"
+          git push
