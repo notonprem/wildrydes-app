@@ -33,6 +33,7 @@ jobs:
           name: WildRydes-Stack
           template: wildrydes_template.yml
           no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
           parameter-overrides: >-
             AccessToken=${{ secrets.ACCESS_TOKEN }},
             Repository=https://github.com/notonprem/wildrydes-site
