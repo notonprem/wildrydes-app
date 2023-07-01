@@ -47,7 +47,7 @@ Resources:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       ClientName: WildRydesWeb
-      UserPoolId: !Ref UserPool
+      UserPoolId: !Ref WildRydesUserPool
       GenerateSecret: false
   ################################################################
 
@@ -222,7 +222,7 @@ Resources:
 Outputs:
   userPoolId:
     Description: The User Pool ID
-    Value: !Ref UserPool
+    Value: !Ref WildRydesUserPool
   userPoolClientId:
     Description: The User Pool Client ID
-    Value: !Ref UserPoolClient
+    Value: !Ref WildRydesUserPoolClient
