@@ -56,6 +56,7 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: Rides
+      BillingMode: PAY_PER_REQUEST
       KeySchema:
         - AttributeName: "RideId"
           KeyType: "HASH"
@@ -94,7 +95,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Description: Core function that will process API requests from the web application to dispatch a unicorn
-      Handler: exports.handler
+      Handler: index.handler
       Runtime: nodejs16.x
       Role: !GetAtt WildRydesLamdbaRole.Arn
       Timeout: 120
