@@ -248,6 +248,8 @@ Resources:
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId: !Ref ApiGatewayAuthorizer
       HttpMethod: ANY
+      MethodResponses:
+        - StatusCode: 200
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
@@ -264,6 +266,23 @@ Resources:
       IdentitySource: method.request.header.Authorization
       ProviderARNs:
         - !GetAtt WildRydesUserPool.Arn
+  ##########################################################################
+  ########################## APIGW Deployment #############################
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref WildRydesApiGateWayRestApi
+  ###########################################################################
+  ############################### APIGW Lambda Permission ###################
+  ApiGatewayLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref WildRydesLambdaFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Ref WildRydesApiGateWayRestApi
+  #############################################################################
+
 
 Outputs:
   userPoolId:
@@ -272,3 +291,6 @@ Outputs:
   userPoolClientId:
     Description: The User Pool Client ID
     Value: !Ref WildRydesUserPoolClient
+  ApiGatewayInvokeUrl:
+    Description: The API Gateway url for the site
+    Value: !Sub "https://${WildRydesApiGateWayRestApi}.execute-api.${AWS::Region}.amazonaws.com"
