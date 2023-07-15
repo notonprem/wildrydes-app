@@ -236,7 +236,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId: !GetAtt WildRydesApiGateWayRestApi.RootResourceId
-      PathPart: '{/ride}'
+      PathPart: '{proxy+}'
       RestApiId: !Ref WildRydesApiGateWayRestApi
   #################################################################
   ########################## APIGW Method #########################
