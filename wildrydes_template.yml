@@ -284,6 +284,7 @@ Resources:
     Properties:
       StageName: prod
       RestApiId: !Ref WildRydesApiGateWayRestApi
+      DeploymentId: !Ref ApiGatewayDeployment
   ###########################################################################
 
   ############################### APIGW Lambda Permission ###################
