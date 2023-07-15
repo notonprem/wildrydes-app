@@ -69,7 +69,7 @@ jobs:
 
           sed -i "s/userPoolId:.*/userPoolId: '$userPoolId',/" js/config.js
           sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
-          sed -i "s/invokeUrl:.*/invokeUrl: '$ApiGatewayInvokeUrl',/" js/config.js
+          sed -i "s~invokeUrl: '.*'~invokeUrl: '${ApiGatewayInvokeUrl}'~" js/config.js
 
           git add -A
           current_date_time=$(date)

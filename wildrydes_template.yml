@@ -231,6 +231,7 @@ Resources:
         Types:
           - "EDGE"
   ###############################################################
+
   ######################### APIGW Resource ######################
   ApiGateWayResource:
     Type: AWS::ApiGateway::Resource
@@ -239,6 +240,7 @@ Resources:
       PathPart: '{proxy+}'
       RestApiId: !Ref WildRydesApiGateWayRestApi
   #################################################################
+
   ########################## APIGW Method #########################
   ApiGatewayMethod:
     Type: AWS::ApiGateway::Method
@@ -256,6 +258,7 @@ Resources:
         Uri: !Sub >-
           arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WildRydesLambdaFunction.Arn}/invocations
  ########################################################################
+
  ######################## APIGW Cognito Authorizer ######################
   ApiGatewayAuthorizer:
     Type: AWS::ApiGateway::Authorizer
@@ -267,12 +270,22 @@ Resources:
       ProviderARNs:
         - !GetAtt WildRydesUserPool.Arn
   ##########################################################################
+
   ########################## APIGW Deployment #############################
   ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
     Properties:
       RestApiId: !Ref WildRydesApiGateWayRestApi
   ###########################################################################
+
+  ############################### APIGW Deployment stage ###################
+  ApiGatewayDeploymentStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: prod
+      RestApiId: !Ref WildRydesApiGateWayRestApi
+  ###########################################################################
+
   ############################### APIGW Lambda Permission ###################
   ApiGatewayLambdaPermission:
     Type: AWS::Lambda::Permission
@@ -282,7 +295,6 @@ Resources:
       Principal: apigateway.amazonaws.com
       SourceAccount: !Ref 'AWS::AccountId'
   #############################################################################
-
 
 Outputs:
   userPoolId:
