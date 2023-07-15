@@ -237,7 +237,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId: !GetAtt WildRydesApiGateWayRestApi.RootResourceId
-      PathPart: '{proxy+}'
+      PathPart: '{ride}'
       RestApiId: !Ref WildRydesApiGateWayRestApi
   #################################################################
 
@@ -249,7 +249,7 @@ Resources:
       RestApiId: !Ref WildRydesApiGateWayRestApi
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId: !Ref ApiGatewayAuthorizer
-      HttpMethod: ANY
+      HttpMethod: POST
       MethodResponses:
         - StatusCode: 200
       Integration:
