@@ -306,4 +306,4 @@ Outputs:
     Value: !Ref WildRydesUserPoolClient
   ApiGatewayInvokeUrl:
     Description: The API Gateway url for the site
-    Value: !Sub "https://${WildRydesApiGateWayRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${WildRydesApiGateWayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiGatewayDeploymentStage}"
