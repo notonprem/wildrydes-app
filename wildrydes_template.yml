@@ -236,7 +236,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId: !GetAtt WildRydesApiGateWayRestApi.RootResourceId
-      PathPart: '/ride'  # '{proxy+}'
+      PathPart: '{/ride}'
       RestApiId: !Ref WildRydesApiGateWayRestApi
   #################################################################
   ########################## APIGW Method #########################
@@ -261,7 +261,7 @@ Resources:
       Name: WildRydesCognitoAuthorizer
       Type: COGNITO_USER_POOLS
       RestApiId: !Ref WildRydesApiGateWayRestApi
-      IdentitySource: method.request.header.Auth
+      IdentitySource: method.request.header.Authorization
       ProviderARNs:
         - !GetAtt WildRydesUserPool.Arn
 
