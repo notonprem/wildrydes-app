@@ -280,7 +280,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref WildRydesLambdaFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Ref WildRydesApiGateWayRestApi
+      SourceAccount: !Ref 'AWS::AccountId'
   #############################################################################
 
 
