@@ -220,6 +220,51 @@ Resources:
           }
   ##############################################################
 
+  ############### Module 4 #####################################
+  ######################## APIGW REST API ######################
+  WildRydesApiGateWayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: WildRydes App APIGW for Lambda Target
+      Name: WildRydes
+      EndpointConfiguration:
+        Types:
+          - "EDGE"
+  ###############################################################
+  ######################### APIGW Resource ######################
+  ApiGateWayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt WildRydesApiGateWayRestApi.RootResourceId
+      PathPart: '/ride'  # '{proxy+}'
+      RestApiId: !GetAtt WildRydesApiGateWayRestApi.RestApiId
+  #################################################################
+  ########################## APIGW Method #########################
+  ApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ResourceId: !Ref ApiGateWayResource
+      RestApiId: !GetAtt WildRydesApiGateWayRestApi.RestApiId
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiGatewayAuthorizer
+      HttpMethod: ANY
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub >-
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WildRydesLambdaFunction.Arn}/invocations
+ ########################################################################
+ ######################## APIGW Cognito Authorizer ######################
+  ApiGatewayAuthorizer:
+  Type: AWS::ApiGateway::Authorizer
+  Properties:
+    Name: WildRydesCognitoAuthorizer
+    Type: COGNITO_USER_POOLS
+    RestApiId: !Ref WildRydesApiGateWayRestApi
+    IdentitySource: method.request.header.Auth
+    ProviderARNs:
+      - !GetAtt WildRydesUserPool.Arn
+
 Outputs:
   userPoolId:
     Description: The User Pool ID
