@@ -2,7 +2,7 @@ name: 'Deploy to AWS CloudFormation'
 
 on:
   push:
-    branches: [ main, staging, develop ]
+    branches: [ main, staging, develop, feature-enable-pipeline ]
 
 jobs:
   # This workflow contains a single job called "deploy"
