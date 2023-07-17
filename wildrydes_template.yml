@@ -286,7 +286,6 @@ Resources:
     DependsOn:
       - ApiGatewayMethod
       - ApiGateWayResource
-      - ApiGatewayDeploymentStage
     Type: AWS::ApiGateway::Deployment
     Properties:
       RestApiId: !Ref WildRydesApiGateWayRestApi
