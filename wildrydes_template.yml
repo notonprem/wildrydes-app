@@ -274,6 +274,9 @@ Resources:
 
   ########################## APIGW Deployment #############################
   ApiGatewayDeployment:
+    DependsOn:
+      - ApiGatewayMethod
+      - ApiGateWayResource
     Type: AWS::ApiGateway::Deployment
     Properties:
       RestApiId: !Ref WildRydesApiGateWayRestApi
