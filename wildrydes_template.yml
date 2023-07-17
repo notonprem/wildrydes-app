@@ -94,6 +94,7 @@ Resources:
   WildRydesLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
+      FunctionName: RequestUnicorn
       Description: Core function that will process API requests from the web application to dispatch a unicorn
       Handler: index.handler
       Runtime: nodejs16.x
@@ -292,9 +293,18 @@ Resources:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref WildRydesLambdaFunction
+      FunctionName: !GetAtt WildRydesLambdaFunction.Arn
       Principal: apigateway.amazonaws.com
-      SourceAccount: !Ref 'AWS::AccountId'
+      SourceArn:
+        Fn::Join:
+          - ''
+          - - 'arn:aws:execute-api:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: WildRydesApiGateWayRestApi
+            - "/*/*/*"
   #############################################################################
 
 Outputs:
