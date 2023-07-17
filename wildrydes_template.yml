@@ -238,7 +238,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId: !GetAtt WildRydesApiGateWayRestApi.RootResourceId
-      PathPart: '{ride}'
+      PathPart: 'ride'
       RestApiId: !Ref WildRydesApiGateWayRestApi
   #################################################################
 
@@ -272,16 +272,6 @@ Resources:
         - !GetAtt WildRydesUserPool.Arn
   ##########################################################################
 
-  ########################## APIGW Deployment #############################
-  ApiGatewayDeployment:
-    DependsOn:
-      - ApiGatewayMethod
-      - ApiGateWayResource
-    Type: AWS::ApiGateway::Deployment
-    Properties:
-      RestApiId: !Ref WildRydesApiGateWayRestApi
-  ###########################################################################
-
   ############################### APIGW Deployment stage ###################
   ApiGatewayDeploymentStage:
     Type: AWS::ApiGateway::Stage
@@ -289,6 +279,17 @@ Resources:
       StageName: prod
       RestApiId: !Ref WildRydesApiGateWayRestApi
       DeploymentId: !Ref ApiGatewayDeployment
+  ###########################################################################
+
+  ########################## APIGW Deployment #############################
+  ApiGatewayDeployment:
+    DependsOn:
+      - ApiGatewayMethod
+      - ApiGateWayResource
+      - ApiGatewayDeploymentStage
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref WildRydesApiGateWayRestApi
   ###########################################################################
 
   ############################### APIGW Lambda Permission ###################
