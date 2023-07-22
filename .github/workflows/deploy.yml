@@ -2,10 +2,7 @@ name: 'Deploy to AWS CloudFormation'
 
 on:
   push:
-    branches: [ main, staging, develop ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    branches: [ main, master ]
 
 jobs:
   # This workflow contains a single job called "deploy"
@@ -47,9 +44,11 @@ jobs:
 
           userPoolId=$(jq -r '.[] | select(.OutputKey == "userPoolId") | .OutputValue' "$JSON_FILE")
           userPoolClientId=$(jq -r '.[] | select(.OutputKey == "userPoolClientId") | .OutputValue' "$JSON_FILE")
+          ApiGatewayInvokeUrl=$(jq -r '.[] | select(.OutputKey == "ApiGatewayInvokeUrl") | .OutputValue' "$JSON_FILE")
 
           echo "userPoolClientId=$userPoolClientId" >> $GITHUB_ENV
           echo "userPoolId=$userPoolId" >> $GITHUB_ENV
+          echo "ApiGatewayInvokeUrl=$ApiGatewayInvokeUrl" >> $GITHUB_ENV
 
       # Push changes to repository
       - name: Push changes to repository
@@ -66,9 +65,11 @@ jobs:
           echo "echoing variables...."
           echo $userPoolId
           echo $userPoolClientId
+          echo $ApiGatewayInvokeUrl
 
           sed -i "s/userPoolId:.*/userPoolId: '$userPoolId',/" js/config.js
           sed -i "s/userPoolClientId:.*/userPoolClientId: '$userPoolClientId',/" js/config.js
+          sed -i "s~invokeUrl: '.*'~invokeUrl: '${ApiGatewayInvokeUrl}'~" js/config.js
 
           git add -A
           current_date_time=$(date)

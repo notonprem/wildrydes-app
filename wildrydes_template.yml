@@ -94,6 +94,7 @@ Resources:
   WildRydesLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
+      FunctionName: RequestUnicorn
       Description: Core function that will process API requests from the web application to dispatch a unicorn
       Handler: index.handler
       Runtime: nodejs16.x
@@ -220,6 +221,95 @@ Resources:
           }
   ##############################################################
 
+  ############### Module 4 #####################################
+  ######################## APIGW REST API ######################
+  WildRydesApiGateWayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: WildRydes App APIGW for Lambda Target
+      Name: WildRydes
+      EndpointConfiguration:
+        Types:
+          - "EDGE"
+  ###############################################################
+
+  ######################### APIGW Resource ######################
+  ApiGateWayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt WildRydesApiGateWayRestApi.RootResourceId
+      PathPart: 'ride'
+      RestApiId: !Ref WildRydesApiGateWayRestApi
+  #################################################################
+
+  ########################## APIGW Method #########################
+  ApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ResourceId: !Ref ApiGateWayResource
+      RestApiId: !Ref WildRydesApiGateWayRestApi
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiGatewayAuthorizer
+      HttpMethod: POST
+      MethodResponses:
+        - StatusCode: 200
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub >-
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WildRydesLambdaFunction.Arn}/invocations
+ ########################################################################
+
+ ######################## APIGW Cognito Authorizer ######################
+  ApiGatewayAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: WildRydesCognitoAuthorizer
+      Type: COGNITO_USER_POOLS
+      RestApiId: !Ref WildRydesApiGateWayRestApi
+      IdentitySource: method.request.header.Authorization
+      ProviderARNs:
+        - !GetAtt WildRydesUserPool.Arn
+  ##########################################################################
+
+  ############################### APIGW Deployment stage ###################
+  ApiGatewayDeploymentStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: prod
+      RestApiId: !Ref WildRydesApiGateWayRestApi
+      DeploymentId: !Ref ApiGatewayDeployment
+  ###########################################################################
+
+  ########################## APIGW Deployment #############################
+  ApiGatewayDeployment:
+    DependsOn:
+      - ApiGatewayMethod
+      - ApiGateWayResource
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref WildRydesApiGateWayRestApi
+  ###########################################################################
+
+  ############################### APIGW Lambda Permission ###################
+  ApiGatewayLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt WildRydesLambdaFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ''
+          - - 'arn:aws:execute-api:'
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: WildRydesApiGateWayRestApi
+            - "/*/*/*"
+  #############################################################################
+
 Outputs:
   userPoolId:
     Description: The User Pool ID
@@ -227,3 +317,6 @@ Outputs:
   userPoolClientId:
     Description: The User Pool Client ID
     Value: !Ref WildRydesUserPoolClient
+  ApiGatewayInvokeUrl:
+    Description: The API Gateway url for the site
+    Value: !Sub "https://${WildRydesApiGateWayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiGatewayDeploymentStage}"
